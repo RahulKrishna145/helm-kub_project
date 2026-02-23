@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "app-chart.fullname" . }}-db-config
+data:
+  db-host: "{{ .Values.dbConfig.serviceName }}.{{ .Values.dbConfig.namespace }}.svc.cluster.local"
+  db-name: {{ .Values.dbConfig.dbName | quote }}
