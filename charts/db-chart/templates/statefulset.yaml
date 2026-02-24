@@ -1,5 +1,5 @@
 apiVersion: apps/v1
- kind: StatefulSet
+kind: StatefulSet
 metadata:
   name: {{ include "db-chart.fullname" . }}
   namespace: db-space
@@ -14,6 +14,8 @@ spec:
       labels:
         app: postgres
     spec:
+      # 1. Added ServiceAccount so this pod can talk to Vault
+      serviceAccountName: db-sa 
       containers:
         - name: postgres
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -23,8 +25,14 @@ spec:
               name: postgres
           env:
             - name: POSTGRES_USER
-              value: {{ .Values.auth.user | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: app-db-secret  # Must be created in db-space namespace
+                  key: username
             - name: POSTGRES_PASSWORD
-              value: {{ .Values.auth.password | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: app-db-secret
+                  key: password
             - name: POSTGRES_DB
               value: {{ .Values.auth.database | quote }}

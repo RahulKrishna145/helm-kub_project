@@ -1,0 +1,20 @@
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: db-space
+spec:
+  provider:
+    vault:
+      # Use the internal DNS name since Vault is in the 'vault' namespace
+      server: "http://vault.vault.svc.cluster.local:8200"
+      path: "app-market"
+      version: "v2"
+      auth:
+        kubernetes:
+          # This matches the 'vault auth enable' path we did earlier
+          mountPath: "kubernetes"
+          # This matches the role name we created in Vault
+          role: "app-market-role"
+          serviceAccountRef:
+            name: db-sa
